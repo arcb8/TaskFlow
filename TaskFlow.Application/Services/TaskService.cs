@@ -1,4 +1,5 @@
-﻿using TaskFlow.Application.Interfaces;
+﻿using TaskFlow.Application.Contracts;
+using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Interfaces;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
@@ -27,31 +28,41 @@ public class TaskService : ITaskService
         return await _taskRepository.GetByIdAsync(id);
     }
 
+    
+    // Сервис принимает DTO, а в репозиторий передает доменную модель (маппит DTO в доменную модель)
     // Создать новую задачу
-    public async Task<TaskEntity> CreateAsync(TaskEntity task)
+    public async Task<TaskEntity> CreateAsync(CreateTaskEntityRequest request) // нужнро создать доменную модель
     {
-        task.Id = Guid.NewGuid();            // генерируем уникальный Id
-        task.CreatedAt = DateTime.UtcNow;    // дата создания
-        task.UpdatedAt = DateTime.UtcNow;    // дата последнего изменения
-        task.Status = MyTaskStatus.New;        // по умолчанию новый статус
+        var task = new TaskEntity
+        {
+            Id = Guid.NewGuid(),
+            Title = request.Title,
+            Descriptions = request.Descriptions,
+            Assignee = request.Assignee,
+            DueDate = request.DueDate,
+
+            Status = MyTaskStatus.New,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
 
         var createdTask = await _taskRepository.CreateAsync(task);
         return createdTask;
     }
 
     // Обновить существующую задачу
-    public async Task<TaskEntity> UpdateAsync(Guid id, TaskEntity updatedTask)
+    public async Task<TaskEntity> UpdateAsync(Guid id, UpdateTaskEntityRequest request)
     {
         var existingTask = await _taskRepository.GetByIdAsync(id);
         if (existingTask == null)
             throw new Exception("Task not found"); // можно потом сделать NotFoundException
 
         // Обновляем поля
-        existingTask.Title = updatedTask.Title;
-        existingTask.Descriptions = updatedTask.Descriptions;
-        existingTask.Assignee = updatedTask.Assignee;
-        existingTask.Status = updatedTask.Status;
-        existingTask.DueDate = updatedTask.DueDate;
+        existingTask.Title = request.Title;
+        existingTask.Descriptions = request.Descriptions;
+        existingTask.Assignee = request.Assignee;
+        existingTask.Status = request.Status;
+        existingTask.DueDate = request.DueDate;
         existingTask.UpdatedAt = DateTime.UtcNow;
 
         var task = await _taskRepository.UpdateAsync(existingTask);
@@ -65,14 +76,14 @@ public class TaskService : ITaskService
     }
 
     // Сменить статус задачи
-    public async Task<TaskEntity> ChangeStatusAsync(Guid id, MyTaskStatus newStatus)
+    public async Task<TaskEntity> ChangeStatusAsync(Guid id, ChangeStatusRequest request)
     {
         var task = await _taskRepository.GetByIdAsync(id);
         if (task == null)
             throw new Exception("Task not found");
 
         var oldStatus = task.Status;
-        task.Status = newStatus;
+        task.Status = request.Status;
         task.UpdatedAt = DateTime.UtcNow;
 
         var updatedTask = await _taskRepository.UpdateAsync(task);
@@ -81,14 +92,14 @@ public class TaskService : ITaskService
     }
 
     // Назначить исполнителя
-    public async Task<TaskEntity> AssignAsync(Guid id, string assignee)
+    public async Task<TaskEntity> AssignAsync(Guid id, AssignRequest request)
     {
         var task = await _taskRepository.GetByIdAsync(id);
         if (task == null)
             throw new Exception("Task not found");
 
         var oldAssignee = task.Assignee;
-        task.Assignee = assignee;
+        task.Assignee = request.Assignee;
         task.UpdatedAt = DateTime.UtcNow;
 
         var updatedTask = await _taskRepository.UpdateAsync(task);
