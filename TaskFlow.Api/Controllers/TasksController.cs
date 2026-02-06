@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.Contracts;
 using TaskFlow.Application.Interfaces;
-using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("tasks")]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -31,14 +31,14 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] TaskEntity request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateTaskEntityRequest request)
     {
         var task = await _taskService.CreateAsync(request);
         return Ok(task);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] TaskEntity request)
+    public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateTaskEntityRequest request)
     {
         var task = await _taskService.UpdateAsync(id, request);
         return Ok(task);
@@ -52,16 +52,16 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
-    public async Task<IActionResult> ChangeStatusAsync(Guid id, [FromBody] MyTaskStatus newStatus)
+    public async Task<IActionResult> ChangeStatusAsync(Guid id, [FromBody] ChangeStatusRequest request)
     {
-        var task = await _taskService.ChangeStatusAsync(id, newStatus);
+        var task = await _taskService.ChangeStatusAsync(id, request);
         return Ok(task);
     }
 
     [HttpPatch("{id}/assign")]
-    public async Task<IActionResult> AssignAsync(Guid id, [FromBody] string assignee)
+    public async Task<IActionResult> AssignAsync(Guid id, [FromBody] AssignRequest request)
     {
-        var task = await _taskService.AssignAsync(id, assignee);
+        var task = await _taskService.AssignAsync(id, request);
         return Ok(task);
     }
 }
