@@ -37,7 +37,6 @@ public class TaskRepository : ITaskRepository
     public async Task<TaskEntity> UpdateAsync(TaskEntity task)
     {
         // EF Core отслеживает изменения
-        _dbContext.Tasks.Update(task);
         await _dbContext.SaveChangesAsync();
         return task;
     }

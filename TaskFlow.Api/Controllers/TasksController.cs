@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Contracts;
 using TaskFlow.Application.Interfaces;
-using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Controllers;
 
@@ -34,7 +33,11 @@ public class TasksController : ControllerBase
     public async Task<IActionResult> CreateAsync([FromBody] CreateTaskEntityRequest request)
     {
         var task = await _taskService.CreateAsync(request);
-        return Ok(task);
+        return CreatedAtAction(
+            nameof(GetByIdAsync),
+            new { id = task.Id },
+            task
+        );
     }
 
     [HttpPut("{id}")]

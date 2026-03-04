@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using TaskFlow.API.Middleware;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Application.Services;
 using TaskFlow.Domain.Interfaces;
@@ -45,6 +46,8 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

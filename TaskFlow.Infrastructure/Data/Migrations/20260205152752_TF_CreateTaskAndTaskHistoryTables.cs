@@ -25,6 +25,12 @@ namespace TaskFlow.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TaskHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TaskHistories_Tasks_TaskId",
+                        column: x => x.TaskId,
+                        principalTable: "Tasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,6 +50,11 @@ namespace TaskFlow.Infrastructure.Data.Migrations
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                 });
+            
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskHistories_TaskId",
+                table: "TaskHistories",
+                column: "TaskId");
         }
 
         /// <inheritdoc />

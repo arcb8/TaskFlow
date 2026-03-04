@@ -1,8 +1,9 @@
 ﻿using TaskFlow.Domain.Enums;
+using TaskStatus = TaskFlow.Domain.Enums.TaskStatus;
 
 namespace TaskFlow.Application.Contracts;
 
 public class ChangeStatusRequest
 {
-    public MyTaskStatus Status { get; set; }
+    public TaskStatus Status { get; set; }
 }
